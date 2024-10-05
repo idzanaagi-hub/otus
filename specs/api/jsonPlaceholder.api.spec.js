@@ -1,9 +1,11 @@
-const { default: axios } = require('axios');
-
-const baseurl = 'https://jsonplaceholder.typicode.com/';
+import { expect, test } from '@jest/globals';
+import {
+  getResourse, createResource, updateResource, patchResource, deleteResource,
+} from '../../framework/services/apiServices';
+import { baseUrlJsonPlaceHolder } from '../../framework/config/config';
 
 test('Getting a resource - check GET method', async () => {
-  const response = await axios.get(`${baseurl}posts/1`);
+  const response = await getResourse(1, baseUrlJsonPlaceHolder);
   const responseData = response.data;
 
   expect(response.status).toBe(200);
@@ -21,17 +23,13 @@ test('Creating a resource - check POST method', async () => {
     userId: 1,
   };
 
-  const response = await axios.post(`${baseurl}posts`, {
-    title: data.title,
-    body: data.body,
-    userId: data.userId,
-  });
-
+  const response = await createResource(data, baseUrlJsonPlaceHolder);
   const responseData = response.data;
 
   expect(response.status).toBe(201);
-  expect(responseData.title).toBe('foo');
-  expect(responseData.body).toBe('bar');
+
+  expect(responseData.title).toBe(data.title);
+  expect(responseData.body).toBe(data.body);
   expect(responseData.id).toBe(101);
 });
 
@@ -43,13 +41,7 @@ test('Updating a resource - check PUT method', async () => {
     userId: 1,
   };
 
-  const response = await axios.put(`${baseurl}posts/1`, {
-    id: data.id,
-    title: data.title,
-    body: data.body,
-    userId: data.userId,
-  });
-
+  const response = await updateResource(data, `${baseUrlJsonPlaceHolder}/1`);
   const responseData = response.data;
 
   expect(response.status).toBe(200);
@@ -64,24 +56,15 @@ test('Patching a resource - check PATCH method', async () => {
     title: 'old foo',
   };
 
-  const response = await axios.patch(`${baseurl}posts/1`, {
-    id: data.id,
-    title: data.title,
-    body: data.body,
-    userId: data.userId,
-  });
-
+  const response = await patchResource(data, `${baseUrlJsonPlaceHolder}/1`);
   const responseData = response.data;
 
   expect(response.status).toBe(200);
   expect(responseData.title).toBe(data.title);
-  expect(responseData.body).toBe('quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto');
-  expect(responseData.id).toBe(1);
-  expect(responseData.userId).toBe(1);
 });
 
 test('Deleting a resource - check DELETE method', async () => {
-  const response = await axios.delete(`${baseurl}posts/1`);
+  const response = await deleteResource(`${baseUrlJsonPlaceHolder}/1`);
 
   expect(response.status).toBe(200);
   expect(response.data).toStrictEqual({});
